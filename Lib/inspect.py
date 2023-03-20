@@ -2235,8 +2235,6 @@ def _signature_fromstr(cls, obj, s, skip_bound_arg=True):
 
     def parse_name(node):
         assert isinstance(node, ast.arg)
-        if node.annotation is not None:
-            raise ValueError("Annotations are not currently supported")
         return node.arg
 
     def wrap_value(s):
@@ -2293,7 +2291,11 @@ def _signature_fromstr(cls, obj, s, skip_bound_arg=True):
                 default = ast.literal_eval(default_node)
             except ValueError:
                 raise ValueError("{!r} builtin has invalid signature".format(obj)) from None
-        parameters.append(Parameter(name, kind, default=default, annotation=empty))
+        if name_node.annotation is not None:
+            annotation = name_node.annotation.id
+        else:
+            annotation = empty
+        parameters.append(Parameter(name, kind, default=default, annotation=annotation))
 
     # non-keyword-only parameters
     total_non_kw_args = len(f.args.posonlyargs) + len(f.args.args)
