@@ -2342,7 +2342,12 @@ def _signature_fromstr(cls, obj, s, skip_bound_arg=True):
             p = parameters[0].replace(kind=Parameter.POSITIONAL_ONLY)
             parameters[0] = p
 
-    return cls(parameters, return_annotation=cls.empty)
+    if f.returns is not None:
+        return_annotation = f.returns.id
+    else:
+        return_annotation=cls.empty
+
+    return cls(parameters, return_annotation=return_annotation)
 
 
 def _signature_from_builtin(cls, func, skip_bound_arg=True):
